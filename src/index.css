@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'DM Sans', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: hsl(var(--foreground));
+  background-color: hsl(var(--background));
+
+  --background: 210 40% 98%;
+  --foreground: 220 23% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 23% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 23% 15%;
+  --primary: 215 100% 34%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 184 65% 46%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 46%;
+  --accent: 40 95% 54%;
+  --accent-foreground: 215 28% 15%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 32% 86%;
+  --input: 214 32% 86%;
+  --ring: 215 80% 40%;
+  --chart-1: 215 94% 47%;
+  --chart-2: 184 65% 46%;
+  --chart-3: 42 92% 60%;
+  --chart-4: 12 90% 58%;
+  --chart-5: 308 70% 55%;
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: 222 50% 7%;
+  --foreground: 210 40% 96%;
+  --card: 222 50% 9%;
+  --card-foreground: 210 40% 96%;
+  --popover: 222 50% 10%;
+  --popover-foreground: 210 40% 96%;
+  --primary: 215 100% 68%;
+  --primary-foreground: 223 84% 7%;
+  --secondary: 184 70% 46%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 222 20% 16%;
+  --muted-foreground: 215 20% 70%;
+  --accent: 42 96% 63%;
+  --accent-foreground: 220 30% 12%;
+  --destructive: 0 70% 40%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 222 32% 18%;
+  --input: 222 32% 18%;
+  --ring: 215 92% 72%;
+  --chart-1: 215 72% 65%;
+  --chart-2: 184 80% 60%;
+  --chart-3: 42 85% 70%;
+  --chart-4: 12 80% 65%;
+  --chart-5: 308 70% 65%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    min-height: 100vh;
+  }
+
+  main {
+    @apply w-full;
+  }
+
+  a {
+    @apply text-primary underline-offset-4 transition-colors;
+  }
+
+  a:hover {
+    @apply text-primary/80;
+  }
+}

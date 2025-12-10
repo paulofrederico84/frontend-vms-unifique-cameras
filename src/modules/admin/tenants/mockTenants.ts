@@ -1,0 +1,189 @@
+export type TenantPlan = 'basic' | 'standard' | 'advanced' | 'enterprise'
+export type TenantStatus = 'active' | 'suspended' | 'inactive' | 'trial'
+
+export type TenantContact = {
+  name: string
+  email: string
+  phone: string
+}
+
+export type TenantSiteSummary = {
+  id: string
+  name: string
+  cameras: number
+}
+
+export type TenantRecord = {
+  id: string
+  name: string
+  document: string
+  plan: TenantPlan
+  status: TenantStatus
+  cameras: number
+  activeCameras: number
+  sites: number
+  users: number
+  createdAt: string
+  storage: {
+    usedTb: number
+    totalTb: number
+  }
+  contact: TenantContact
+  siteSummary: TenantSiteSummary[]
+}
+
+export const TENANT_MOCKS: TenantRecord[] = [
+  {
+    id: 'tnt-001',
+    name: 'Unifique Headquarters',
+    document: '12.345.678/0001-99',
+    plan: 'enterprise',
+    status: 'active',
+    cameras: 356,
+    activeCameras: 342,
+    sites: 12,
+    users: 78,
+    createdAt: '2023-04-12',
+    storage: { usedTb: 62, totalTb: 80 },
+    contact: {
+      name: 'Letícia Gomes',
+      email: 'leticia@unifique.com.br',
+      phone: '(47) 99999-1010',
+    },
+    siteSummary: [
+      { id: 'site-001', name: 'Campus Matriz Blumenau', cameras: 148 },
+      { id: 'site-002', name: 'Data Center NOC', cameras: 96 },
+      { id: 'site-003', name: 'Campus Florianópolis', cameras: 64 },
+    ],
+  },
+  {
+    id: 'tnt-002',
+    name: 'Retail Park Brasil',
+    document: '27.901.222/0001-45',
+    plan: 'advanced',
+    status: 'active',
+    cameras: 184,
+    activeCameras: 171,
+    sites: 7,
+    users: 42,
+    createdAt: '2022-09-05',
+    storage: { usedTb: 28, totalTb: 40 },
+    contact: {
+      name: 'Rafael Dias',
+      email: 'rafael@retailpark.com.br',
+      phone: '(11) 98888-4545',
+    },
+    siteSummary: [
+      { id: 'site-010', name: 'Mega Center Zona Sul', cameras: 64 },
+      { id: 'site-011', name: 'Logística Campinas', cameras: 54 },
+    ],
+  },
+  {
+    id: 'tnt-003',
+    name: 'Hospital Vida Plena',
+    document: '05.444.301/0001-02',
+    plan: 'standard',
+    status: 'suspended',
+    cameras: 112,
+    activeCameras: 84,
+    sites: 3,
+    users: 25,
+    createdAt: '2021-01-19',
+    storage: { usedTb: 12, totalTb: 25 },
+    contact: {
+      name: 'Patrícia Nunes',
+      email: 'patricia@vidaplena.org',
+      phone: '(21) 97777-1212',
+    },
+    siteSummary: [
+      { id: 'site-020', name: 'Centro Cirúrgico', cameras: 48 },
+      { id: 'site-021', name: 'UTI Adulto', cameras: 32 },
+    ],
+  },
+  {
+    id: 'tnt-004',
+    name: 'Colégio Horizonte',
+    document: '88.210.333/0001-66',
+    plan: 'standard',
+    status: 'active',
+    cameras: 74,
+    activeCameras: 70,
+    sites: 4,
+    users: 19,
+    createdAt: '2024-02-27',
+    storage: { usedTb: 8, totalTb: 15 },
+    contact: {
+      name: 'Daniel Souza',
+      email: 'daniel@colegiohorizonte.edu',
+      phone: '(31) 96666-9090',
+    },
+    siteSummary: [
+      { id: 'site-030', name: 'Campus Principal', cameras: 32 },
+      { id: 'site-031', name: 'Unidade Infantil', cameras: 22 },
+    ],
+  },
+  {
+    id: 'tnt-005',
+    name: 'Inova Agro Logística',
+    document: '41.888.002/0001-11',
+    plan: 'basic',
+    status: 'inactive',
+    cameras: 28,
+    activeCameras: 0,
+    sites: 2,
+    users: 8,
+    createdAt: '2020-07-02',
+    storage: { usedTb: 0, totalTb: 5 },
+    contact: {
+      name: 'Gustavo Prado',
+      email: 'gustavo@inovaagro.com',
+      phone: '(62) 91234-0001',
+    },
+    siteSummary: [{ id: 'site-040', name: 'CD Goiânia', cameras: 18 }],
+  },
+  {
+    id: 'tnt-006',
+    name: 'Vila Olímpica Residencial',
+    document: '09.331.765/0001-09',
+    plan: 'advanced',
+    status: 'trial',
+    cameras: 46,
+    activeCameras: 38,
+    sites: 5,
+    users: 15,
+    createdAt: '2025-05-18',
+    storage: { usedTb: 3, totalTb: 10 },
+    contact: {
+      name: 'Ítalo Fernandes',
+      email: 'italo@vilalimited.com',
+      phone: '(21) 93456-8723',
+    },
+    siteSummary: [
+      { id: 'site-050', name: 'Bloco Atlântico', cameras: 12 },
+      { id: 'site-051', name: 'Bloco Mediterrâneo', cameras: 10 },
+    ],
+  },
+  {
+    id: 'tnt-007',
+    name: 'Nova Ferrovia Paulista',
+    document: '55.109.351/0001-70',
+    plan: 'enterprise',
+    status: 'active',
+    cameras: 268,
+    activeCameras: 250,
+    sites: 9,
+    users: 61,
+    createdAt: '2023-11-09',
+    storage: { usedTb: 38, totalTb: 60 },
+    contact: {
+      name: 'Fernanda Seabra',
+      email: 'fernanda@nfpa.com',
+      phone: '(19) 90021-1122',
+    },
+    siteSummary: [
+      { id: 'site-060', name: 'Terminal Campinas', cameras: 74 },
+      { id: 'site-061', name: 'Terminal Jundiaí', cameras: 58 },
+      { id: 'site-062', name: 'COE São Paulo', cameras: 42 },
+    ],
+  },
+]
