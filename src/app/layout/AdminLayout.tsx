@@ -1,16 +1,15 @@
 import { useState } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
 
 import { Header } from '@/components/layout/Header'
 import { Button } from '@/components/ui/button'
 import { Sidebar } from '@/modules/shared/components/Sidebar'
 import { cn } from '@/lib/utils'
-import { useAuth } from '@/modules/auth/context/AuthContext'
+import { useAuth } from '@/contexts/AuthContext'
 
 export function AdminLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false)
-  const navigate = useNavigate()
   const { user, logout } = useAuth()
 
   if (!user) {
@@ -21,9 +20,8 @@ export function AdminLayout() {
     )
   }
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
+  const handleLogout = async () => {
+    await logout()
   }
 
   return (

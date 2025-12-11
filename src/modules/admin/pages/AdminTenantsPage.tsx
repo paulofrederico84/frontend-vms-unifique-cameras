@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { TenantDetailsDrawer } from '@/modules/admin/tenants/components/TenantDetailsDrawer'
@@ -6,8 +6,8 @@ import { TenantFiltersBar } from '@/modules/admin/tenants/components/TenantFilte
 import { TenantKpisHeader } from '@/modules/admin/tenants/components/TenantKpisHeader'
 import { TenantListTable } from '@/modules/admin/tenants/components/TenantListTable'
 import type { TenantPlan, TenantRecord, TenantStatus } from '@/modules/admin/tenants/mockTenants'
-import { TENANT_MOCKS } from '@/modules/admin/tenants/mockTenants'
-import { useAuth } from '@/modules/auth/context/AuthContext'
+import { useDevData } from '@/hooks/useDevData'
+import { useAuth } from '@/contexts/AuthContext'
 import { SystemRole } from '@/modules/shared/types/auth'
 
 function buildTenantStats(tenants: TenantRecord[]) {
@@ -27,10 +27,19 @@ export function AdminTenantsPage() {
   const [planFilter, setPlanFilter] = useState<TenantPlan | 'all'>('all')
   const [selectedTenant, setSelectedTenant] = useState<TenantRecord | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
-  const kpiStats = useMemo(() => buildTenantStats(TENANT_MOCKS), [])
+  const loadTenantsFixtures = useCallback(async () => {
+    const module = await import('@/fixtures')
+    return module.mockTenants
+  }, [])
+
+  const devTenants = useDevData<TenantRecord>(loadTenantsFixtures)
+
+  const tenants = import.meta.env.DEV ? devTenants : []
+
+  const kpiStats = useMemo(() => buildTenantStats(tenants), [tenants])
 
   const filteredTenants = useMemo(() => {
-    return TENANT_MOCKS.filter((tenant) => {
+    return tenants.filter((tenant) => {
       const matchesSearch =
         search.trim().length === 0 ||
         tenant.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -42,7 +51,7 @@ export function AdminTenantsPage() {
 
       return matchesSearch && matchesStatus && matchesPlan
     })
-  }, [planFilter, search, statusFilter])
+  }, [planFilter, search, statusFilter, tenants])
 
   if (!user) {
     return (

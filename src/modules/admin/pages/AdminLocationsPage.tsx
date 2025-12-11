@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { LocationDetailsDrawer } from '@/modules/admin/locations/components/LocationDetailsDrawer'
@@ -7,10 +7,9 @@ import { LocationKpisHeader } from '@/modules/admin/locations/components/Locatio
 import { LocationListTable } from '@/modules/admin/locations/components/LocationListTable'
 import { CameraDetailsDrawer } from '@/modules/admin/locations/components/CameraDetailsDrawer'
 import type { AdminCamera, AdminCameraStatus } from '@/modules/admin/locations/mockCameras'
-import { CAMERA_MODELS, CAMERA_MOCKS } from '@/modules/admin/locations/mockCameras'
 import type { AdminLocation } from '@/modules/admin/locations/mockLocations'
-import { LOCATION_MOCKS, buildLocationKpiStats } from '@/modules/admin/locations/mockLocations'
-import { TENANT_MOCKS } from '@/modules/admin/tenants/mockTenants'
+import { buildLocationKpiStats } from '@/modules/admin/locations/mockLocations'
+import { useDevData } from '@/hooks/useDevData'
 
 export function AdminLocationsPage() {
   const [search, setSearch] = useState('')
@@ -23,20 +22,48 @@ export function AdminLocationsPage() {
   const [selectedCamera, setSelectedCamera] = useState<AdminCamera | null>(null)
   const [isCameraDrawerOpen, setIsCameraDrawerOpen] = useState(false)
 
-  const tenantOptions = useMemo(() => TENANT_MOCKS.map((tenant) => ({ value: tenant.id, label: tenant.name })), [])
+  const loadLocationsFixtures = useCallback(async () => {
+    const module = await import('@/fixtures')
+    return module.mockLocations
+  }, [])
+
+  const loadCamerasFixtures = useCallback(async () => {
+    const module = await import('@/fixtures')
+    return module.mockCameras
+  }, [])
+
+  const devLocations = useDevData<AdminLocation>(loadLocationsFixtures)
+  const devCameras = useDevData<AdminCamera>(loadCamerasFixtures)
+
+  const locations = import.meta.env.DEV ? devLocations : []
+  const cameras = import.meta.env.DEV ? devCameras : []
+
+  const tenantOptions = useMemo(() => {
+    const unique = new Map<string, string>()
+    locations.forEach((location) => {
+      if (!unique.has(location.tenantId)) {
+        unique.set(location.tenantId, location.tenantName)
+      }
+    })
+    return Array.from(unique.entries()).map(([value, label]) => ({ value, label }))
+  }, [locations])
 
   const camerasByLocation = useMemo(() => {
-    return CAMERA_MOCKS.reduce<Record<string, AdminCamera[]>>((acc, camera) => {
+    return cameras.reduce<Record<string, AdminCamera[]>>((acc, camera) => {
       if (!acc[camera.locationId]) {
         acc[camera.locationId] = []
       }
       acc[camera.locationId].push(camera)
       return acc
     }, {})
-  }, [])
+  }, [cameras])
+
+  const cameraModels = useMemo(() => {
+    return Array.from(new Set(cameras.map((camera) => camera.model))).sort()
+  }, [cameras])
 
   const kpiStats = useMemo(() => {
-    const stats = buildLocationKpiStats(LOCATION_MOCKS)
+    const stats = buildLocationKpiStats(locations)
     return {
       totalLocations: stats.totalLocations,
       totalCameras: stats.totalCameras,
@@ -44,10 +71,10 @@ export function AdminLocationsPage() {
       offlineCameras: stats.offlineCameras,
       healthPercentage: stats.healthPercentage,
     }
-  }, [])
+  }, [locations])
 
   const filteredLocations = useMemo(() => {
-    return LOCATION_MOCKS.filter((location) => {
+    return locations.filter((location) => {
       const matchesSearch =
         search.trim().length === 0 ||
         location.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -74,7 +101,7 @@ export function AdminLocationsPage() {
 
       return matchesSearch && matchesTenant && matchesVolume && matchesStatus && matchesCameraModel
     })
-  }, [cameraModelFilter, cameraVolume, camerasByLocation, search, statusFilter, tenantFilter])
+  }, [cameraModelFilter, cameraVolume, camerasByLocation, locations, search, statusFilter, tenantFilter])
 
   const handleSelectLocation = (location: AdminLocation) => {
     setSelectedLocation(location)
@@ -136,7 +163,7 @@ export function AdminLocationsPage() {
           setCameraVolume('all')
         }}
         tenantOptions={tenantOptions}
-        cameraModels={CAMERA_MODELS}
+        cameraModels={cameraModels}
       />
 
       <LocationListTable locations={filteredLocations} onSelectLocation={handleSelectLocation} />

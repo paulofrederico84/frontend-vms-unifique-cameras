@@ -5,7 +5,7 @@ import { KpiCard } from '@/modules/admin/dashboard/components/KpiCard'
 import { StatusDistribution } from '@/modules/admin/dashboard/components/StatusDistribution'
 import { StorageDonutChart } from '@/modules/admin/dashboard/components/StorageDonutChart'
 import { TrendCard } from '@/modules/admin/dashboard/components/TrendCard'
-import { useAuth } from '@/modules/auth/context/AuthContext'
+import { useAuth } from '@/contexts/AuthContext'
 import { SystemRole } from '@/modules/shared/types/auth'
 
 const dashboardMock = {

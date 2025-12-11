@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { AiAlertsKpisHeader } from '@/modules/admin/ai-alerts/components/AiAlertsKpisHeader'
@@ -8,20 +8,36 @@ import { AiEventsByTenantTable } from '@/modules/admin/ai-alerts/components/AiEv
 import { AlertRuleDetailsDrawer } from '@/modules/admin/ai-alerts/components/AlertRuleDetailsDrawer'
 import { AlertRulesList } from '@/modules/admin/ai-alerts/components/AlertRulesList'
 import {
-  AI_EVENT_MOCKS,
   aggregateEventsByType,
   buildAiAlertsKpis,
   buildEventsTimeline,
-  buildTenantEventStats
+  buildTenantEventStats,
+  type AiEvent
 } from '@/modules/admin/ai-alerts/mockAiEvents'
 import type { AlertRule } from '@/modules/admin/ai-alerts/mockAlertRules'
-import { ALERT_RULES } from '@/modules/admin/ai-alerts/mockAlertRules'
+import { useDevData } from '@/hooks/useDevData'
 
 export function AdminAiAlertsPage() {
-  const kpiStats = useMemo(() => buildAiAlertsKpis(AI_EVENT_MOCKS), [])
-  const eventsByType = useMemo(() => aggregateEventsByType(AI_EVENT_MOCKS), [])
-  const timelineData = useMemo(() => buildEventsTimeline(AI_EVENT_MOCKS), [])
-  const tenantRows = useMemo(() => buildTenantEventStats(AI_EVENT_MOCKS).slice(0, 6), [])
+  const loadAiEventsFixtures = useCallback(async () => {
+    const module = await import('@/fixtures')
+    return module.mockAiEvents
+  }, [])
+
+  const loadAlertRulesFixtures = useCallback(async () => {
+    const module = await import('@/fixtures')
+    return module.mockAlerts
+  }, [])
+
+  const devAiEvents = useDevData<AiEvent>(loadAiEventsFixtures)
+  const devAlertRules = useDevData<AlertRule>(loadAlertRulesFixtures)
+
+  const aiEvents = import.meta.env.DEV ? devAiEvents : []
+  const alertRules = import.meta.env.DEV ? devAlertRules : []
+
+  const kpiStats = useMemo(() => buildAiAlertsKpis(aiEvents), [aiEvents])
+  const eventsByType = useMemo(() => aggregateEventsByType(aiEvents), [aiEvents])
+  const timelineData = useMemo(() => buildEventsTimeline(aiEvents), [aiEvents])
+  const tenantRows = useMemo(() => buildTenantEventStats(aiEvents).slice(0, 6), [aiEvents])
   const [selectedRule, setSelectedRule] = useState<AlertRule | null>(null)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
@@ -70,7 +86,7 @@ export function AdminAiAlertsPage() {
             Ajustes macro definidos pelo Admin Master. Clientes Masters herdam e refinam conforme cada ambiente.
           </p>
         </div>
-        <AlertRulesList rules={ALERT_RULES} onSelectRule={handleSelectRule} />
+        <AlertRulesList rules={alertRules} onSelectRule={handleSelectRule} />
       </div>
 
       <AlertRuleDetailsDrawer rule={selectedRule} open={isDrawerOpen} onOpenChange={handleDrawerChange} />

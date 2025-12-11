@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { AuditActionBadge } from '@/modules/admin/audit/components/AuditActionBadge'
 import { AuditEventDetailsDrawer } from '@/modules/admin/audit/components/AuditEventDetailsDrawer'
@@ -10,11 +10,11 @@ import {
   AUDIT_ACTION_LABELS,
   AUDIT_REFERENCE_TIMESTAMP,
   buildAuditKpis,
-  getUniqueAuditTenants,
-  mockAuditEvents
+  getUniqueAuditTenants
 } from '@/modules/admin/audit/mockAuditEvents'
 import { AuditSeverityBadge } from '@/modules/admin/audit/components/AuditSeverityBadge'
 import type { SystemRole } from '@/modules/shared/types/auth'
+import { useDevData } from '@/hooks/useDevData'
 
 const DATE_RANGE_MS: Record<Exclude<AuditDateRange, 'custom'>, number> = {
   '24h': 24 * 60 * 60 * 1000,
@@ -32,19 +32,27 @@ export function AdminAuditPage() {
   const [selectedEvent, setSelectedEvent] = useState<AuditEvent | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
-  const stats = useMemo(() => buildAuditKpis(mockAuditEvents, AUDIT_REFERENCE_TIMESTAMP), [])
-  const tenantOptions = useMemo(() => getUniqueAuditTenants(mockAuditEvents), [])
-  const actionOptions = useMemo(() => {
-    const unique = Array.from(new Set(mockAuditEvents.map((event) => event.actionType)))
-    return unique.sort((a, b) => AUDIT_ACTION_LABELS[a].localeCompare(AUDIT_ACTION_LABELS[b]))
+  const loadAuditFixtures = useCallback(async () => {
+    const module = await import('@/fixtures')
+    return module.mockAuditEvents
   }, [])
+
+  const devAuditEvents = useDevData<AuditEvent>(loadAuditFixtures)
+  const auditEvents = import.meta.env.DEV ? devAuditEvents : []
+
+  const stats = useMemo(() => buildAuditKpis(auditEvents, AUDIT_REFERENCE_TIMESTAMP), [auditEvents])
+  const tenantOptions = useMemo(() => getUniqueAuditTenants(auditEvents), [auditEvents])
+  const actionOptions = useMemo(() => {
+    const unique = Array.from(new Set(auditEvents.map((event) => event.actionType)))
+    return unique.sort((a, b) => AUDIT_ACTION_LABELS[a].localeCompare(AUDIT_ACTION_LABELS[b]))
+  }, [auditEvents])
 
   const filteredEvents = useMemo(() => {
     const rangeLimit =
       dateRange === 'custom' ? null : AUDIT_REFERENCE_TIMESTAMP - DATE_RANGE_MS[dateRange]
     const searchTerm = search.trim().toLowerCase()
 
-    return mockAuditEvents.filter((event) => {
+    return auditEvents.filter((event) => {
       if (rangeLimit && new Date(event.timestamp).getTime() < rangeLimit) {
         return false
       }
@@ -80,7 +88,7 @@ export function AdminAuditPage() {
       }
       return true
     })
-  }, [search, role, severity, action, tenant, dateRange])
+  }, [search, role, severity, action, tenant, dateRange, auditEvents])
 
   const handleResetFilters = () => {
     setSearch('')
